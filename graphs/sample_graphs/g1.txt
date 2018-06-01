@@ -1,0 +1,11 @@
+FORMAT: ADJACENCY_LIST
+
+GRAPH:
+a: d,b,h
+b: a,c,f
+c: b,d,e,g
+d: a,c,e
+e: c,d,h
+f: b,g
+g: c,f,h
+h: a,e,g
