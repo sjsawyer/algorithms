@@ -12,6 +12,24 @@ def _parse_adjacency_list(edge_lst):
     return graph
 
 
+def _parse_adjacency_matrix(edge_lst):
+    '''
+    `edge_lst` is a list of strings, where each string begins with a node
+    '<node>: ', and is followed by a comma separated list of weights for the
+    edge connecting it to every other node in the graph. A weight of 0 means
+    there is no connection between two nodes.
+    '''
+    graph = [[None for _ in edge_lst] for _ in edge_lst]
+    labels = [None for _ in edge_lst]
+    for i in xrange(len(edge_lst)):
+        node, weights = edge_lst[i].split(": ")
+        weights = weights.split(",")
+        for j in xrange(len(weights)):
+            graph[i][j] = int(weights[j])
+        labels[i] = node
+    return graph, labels
+
+
 def from_txt(filepath):
     '''
     Read a graph from a text file of a suitable format and return it in the
@@ -37,7 +55,8 @@ def from_txt(filepath):
 
     if format == "ADJACENCY_LIST":
         graph = _parse_adjacency_list(graph)
-
+    elif format == "ADJACENCY_MATRIX":
+        graph = _parse_adjacency_matrix(graph)
     else:
         return ValueError("Unrecognized format")
 
