@@ -17,9 +17,9 @@ def minimal_spanning_tree(graph, root):
     # the mst we will return
     tree = {}
     # queue to keep track of the vertices in a BFS order
-    queue = deque()
-    # the set of vertices we have visited so far
-    visited = set()
+    unvisited = deque()
+    # the set of vertices we have seen so far
+    seen = set()
     # check for an empty graph
     if not graph:
         return tree
@@ -27,16 +27,16 @@ def minimal_spanning_tree(graph, root):
     for node in graph:
         tree[node] = set()
     # we start at the root
-    queue.append(root)
-    visited.add(root)
-    while queue:
-        # we have nodes left to explore
-        node = queue.popleft()
+    unvisited.append(root)
+    seen.add(root)
+    while unvisited:
+        # visit and explore the next node in the queue
+        node = unvisited.popleft()
         for neighbor in graph[node]:
-            if neighbor not in visited:
+            if neighbor not in seen:
                 # have not seen this node yet, so add it
-                visited.add(neighbor)
-                queue.append(neighbor)
+                seen.add(neighbor)
+                unvisited.append(neighbor)
                 # neighbor and node are adjacent in the tree
                 tree[neighbor].add(node)
                 tree[node].add(neighbor)
@@ -45,7 +45,9 @@ def minimal_spanning_tree(graph, root):
 
 def main():
     from sample_graphs import g1
-    mst = minimal_spanning_tree(g1)
+    root = g1.iterkeys().next()
+    mst = minimal_spanning_tree(g1, root)
+    print "Minimum spanning tree from {}:".format(root)
     for k, v in mst.iteritems():
         print "{}: {}".format(k, " ".join(v))
 
