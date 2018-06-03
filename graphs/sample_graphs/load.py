@@ -29,6 +29,13 @@ def _parse_adjacency_matrix(edge_lst):
         labels[i] = node
     return graph, labels
 
+def _parse_adjacency_matrix_with_heuristic(edge_lst):
+    split_idx = edge_lst.index("EUCLIDEAN_COORDS:")
+    edge_lst, heuristic = edge_lst[:split_idx-1], edge_lst[split_idx+1:]
+    graph, labels = _parse_adjacency_matrix(edge_lst)
+    coords = [map(float, s.split(': ')[-1].split(',')) for s in heuristic]
+    return graph, labels, coords
+
 
 def from_txt(filepath):
     '''
@@ -54,11 +61,13 @@ def from_txt(filepath):
         del(graph[-1])
 
     if format == "ADJACENCY_LIST":
-        graph = _parse_adjacency_list(graph)
+        data = _parse_adjacency_list(graph)
     elif format == "ADJACENCY_MATRIX":
-        graph = _parse_adjacency_matrix(graph)
+        data = _parse_adjacency_matrix(graph)
+    elif format == "ADJACENCY_MATRIX_WITH_HEURISTIC":
+        data = _parse_adjacency_matrix_with_heuristic(graph)
     else:
         return ValueError("Unrecognized format")
 
-    return graph
+    return data
 
