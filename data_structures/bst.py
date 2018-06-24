@@ -105,7 +105,7 @@ class BST:
                 # inorder successor to the roots position
                 root.value = inordersuccessor.value
                 # delete the inordersuccessor from the right subtree
-                self._remove(inordersuccessor.value, root.right)
+                root.right = self._remove(inordersuccessor.value, root.right)
         # always return the (possibly updated) root
         return root
 
