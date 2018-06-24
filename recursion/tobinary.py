@@ -7,21 +7,19 @@ def tobinary(n):
     '101011'
 
     '''
-    # Store the binary digits here
-    digits = []
-
-    def _tobinary(n):
+    def _tobinary(digits_so_far, n):
         if n < 0:
-            digits.append('-')
-            _tobinary(-n)
+            digits_so_far.append('-')
+            return _tobinary(digits_so_far, -n)
         elif n < 2:
-            digits.append(str(n))
+            digits_so_far.append(str(n))
+            return digits_so_far
         else:
-            _tobinary(n/2)
-            digits.append(str(n % 2))
+            digits_so_far = _tobinary(digits_so_far, n/2)
+            digits_so_far.append(str(n % 2))
+            return digits_so_far
 
-    # Populate `digits`
-    _tobinary(n)
+    digits = _tobinary([], n)
     # Return as a string
     return "".join(digits)
 
