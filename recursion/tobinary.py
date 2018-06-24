@@ -11,11 +11,14 @@ def tobinary(n):
     digits = []
 
     def _tobinary(n):
-        if n < 2:
+        if n < 0:
+            digits.append('-')
+            _tobinary(-n)
+        elif n < 2:
             digits.append(str(n))
-            return
-        _tobinary(n/2)
-        digits.append(str(n % 2))
+        else:
+            _tobinary(n/2)
+            digits.append(str(n % 2))
 
     # Populate `digits`
     _tobinary(n)
@@ -24,8 +27,10 @@ def tobinary(n):
 
 
 def main():
-    n = 43
-    print tobinary(n)
+    n1 = 43
+    n2 = -127
+    print "{}: {}".format(n1, tobinary(n1))
+    print "{}: {}".format(n2, tobinary(n2))
 
 
 if __name__ == '__main__':
