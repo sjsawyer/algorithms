@@ -14,13 +14,11 @@ def tobinary(n):
         if n < 2:
             digits.append(str(n))
             return
-        digits.append(str(n % 2))
         _tobinary(n/2)
+        digits.append(str(n % 2))
 
     # Populate `digits`
     _tobinary(n)
-    # Reverse to get the correct representation
-    digits.reverse()
     # Return as a string
     return "".join(digits)
 
