@@ -27,7 +27,7 @@ def max_adjacent_colors(grid):
     we can recursively expand to that have the same color, and keep track of
     this value. To ensure we do not revisit neighbours we have seen before,
     we store the coordinates of squares we have seen before in an auxillary
-    grid storing binary values the same size as `grid`
+    grid the same size as `grid` storing binary values
 
     '''
     seen = [[False for _ in range(len(grid[0]))]
@@ -46,12 +46,12 @@ def max_adjacent_colors(grid):
         return neighbours
 
     def _mac(i, j):
-        mac = 0
+        # base case:
         if seen[i][j]:
             return 0
         else:
             # count ourselves
-            mac += 1
+            mac = 1
             seen[i][j] = True
             # count our neighbours
             for (ni, nj) in _get_samecolor_neighbours(i, j):
