@@ -21,20 +21,17 @@ def quick_sort(l):
         # elements greater than p are on the right
         # The following does so in place:
         swap_idx = i+1
-        new_pivot = None
         # Leave the pivot element where it is
         for k in range(i+1, j+1):
             if l[k] < l[p]:
                 l[k], l[swap_idx] = l[swap_idx], l[k]
-                new_pivot = swap_idx
                 swap_idx += 1
         # Move pivot to its new position
-        if new_pivot:
-            l[p], l[new_pivot] = l[new_pivot], l[p]
-            p = new_pivot
+        new_pivot = swap_idx - 1
+        l[p], l[new_pivot] = l[new_pivot], l[p]
         # Now recurse on both sides of the pivot point
-        _quick_sort(i, p-1)
-        _quick_sort(p+1, j)
+        _quick_sort(i, new_pivot-1)
+        _quick_sort(new_pivot+1, j)
 
     # sort l, in place
     _quick_sort(0, len(l)-1)
