@@ -22,37 +22,73 @@ def max_adjacent_colors(grid):
     Return the largest number of squares which have the same color and are
     adjacent to each other
 
+    The idea is to start at a square in the grid and see how many neighbours
+    we can recursively expand to that have the same color, and keep track of
+    this value. To ensure we do not revisit neighbours we have seen before,
+    we store the coordinates of squares we have seen before in an auxillary
+    grid storing binary values the same size as `grid`
+
     '''
-    # dp[i][j] stores the greatest number of squares that are adjacent
-    # to grid[i][j] (including itself), using only the subgrid
-    # grid[0..i][0..j]
-    dp = [[1 for _ in range(len(grid[0]))] for _ in range(len(grid))]
+    seen = [[False for _ in range(len(grid[0]))]
+            for _ in range(len(grid))]
 
-    # Keep track of the max number of squares and corresponding color
-    max_adjacent, color = dp[0][0], grid[0][0]
+    def _get_samecolor_neighbours(i, j):
+        color = grid[i][j]
+        neighbours = set()
+        for ni in range(i-1, i+2):
+            for nj in range(j-1, j+2):
+                # invalid conditions, out of bounds or are ourselves
+                if ni < 0 or nj < 0 \
+                   or ni > len(grid)-1 or nj > len(grid[0])-1 \
+                   or ni == i and nj == j:
+                    continue
+                if grid[ni][nj] == color:
+                    neighbours.add((ni, nj))
+        return neighbours
 
-    # Populate the rest of the table, bottom up
-    for i in range(len(dp)):
-        for j in range(len(dp[0])):
-            if i > 0 and grid[i-1][j] == grid[i][j]:
-                dp[i][j] += dp[i-1][j]
-            if j > 0 and grid[i][j-1] == grid[i][j]:
-                dp[i][j] += dp[i][j-1]
-            if dp[i][j] > max_adjacent:
-                max_adjacent = dp[i][j]
+    def _mac(i, j):
+        mac = 0
+        if seen[i][j]:
+            return 0
+        else:
+            # count ourselves
+            mac += 1
+            seen[i][j] = True
+            # count our neighbours
+            for (ni, nj) in _get_samecolor_neighbours(i, j):
+                if not seen[ni][nj]:
+                    mac += _mac(ni, nj)
+            return mac
+
+    # Perform DFS
+    max_mac, color = 0, None
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            mac = _mac(i, j)
+            if mac > max_mac:
+                max_mac = mac
                 color = grid[i][j]
 
-    # Return the color and the largest number of adjacent colors.
-    return max_adjacent, color
+    return max_mac, color
 
 
 def main():
-    grid = [['B', 'G', 'Y', 'R'],
-            ['B', 'Y', 'Y', 'R'],
-            ['G', 'G', 'Y', 'O'],
-            ['G', 'B', 'O', 'R']]
+    grid1 = [['B', 'G', 'Y', 'R'],
+             ['B', 'Y', 'Y', 'R'],
+             ['G', 'G', 'Y', 'O'],
+             ['G', 'B', 'O', 'R']]
 
-    print max_adjacent_colors(grid)
+    grid2 = [['B', 'B'],
+             ['B', 'B']]
+
+    grid3 = [['Y', 'Y', 'Y', 'Y'],
+             ['Y', 'R', 'R', 'Y'],
+             ['Y', 'Y', 'Y', 'Y']]
+
+    grid4 = [['P', ]]
+
+    for grid in (grid1, grid2, grid3, grid4):
+        print max_adjacent_colors(grid)
 
 
 if __name__ == '__main__':
