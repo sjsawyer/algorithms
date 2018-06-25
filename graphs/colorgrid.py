@@ -17,6 +17,7 @@ Q: Given a grid which has a color in each square, find the largest number of
 
 '''
 
+
 def max_adjacent_colors(grid):
     '''
     Return the largest number of squares which have the same color and are
@@ -35,15 +36,13 @@ def max_adjacent_colors(grid):
     def _get_samecolor_neighbours(i, j):
         color = grid[i][j]
         neighbours = set()
-        for ni in range(i-1, i+2):
-            for nj in range(j-1, j+2):
-                # invalid conditions, out of bounds or are ourselves
-                if ni < 0 or nj < 0 \
-                   or ni > len(grid)-1 or nj > len(grid[0])-1 \
-                   or ni == i and nj == j:
-                    continue
-                if grid[ni][nj] == color:
-                    neighbours.add((ni, nj))
+        # loop over adjacent neighbours
+        for (ni, nj) in [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]:
+            # invalid conditions, out of bounds or are ourselves
+            if ni < 0 or nj < 0 or ni > len(grid)-1 or nj > len(grid[0])-1:
+                pass
+            elif grid[ni][nj] == color:
+                neighbours.add((ni, nj))
         return neighbours
 
     def _mac(i, j):
@@ -85,9 +84,12 @@ def main():
              ['Y', 'R', 'R', 'Y'],
              ['Y', 'Y', 'Y', 'Y']]
 
-    grid4 = [['P', ]]
+    grid4 = [['R', 'G'],
+             ['G', 'R']]
 
-    for grid in (grid1, grid2, grid3, grid4):
+    grid5 = [['P', ]]
+
+    for grid in (grid1, grid2, grid3, grid4, grid5):
         print max_adjacent_colors(grid)
 
 
