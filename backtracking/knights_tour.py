@@ -95,7 +95,7 @@ def knights_tour(board):
 
 
 def main():
-    m, n = 6, 6
+    m, n = 12, 12
     board = [[None for _ in range(n)] for _ in range(m)]
     solved_board = knights_tour(board)
     if solved_board is not None:
