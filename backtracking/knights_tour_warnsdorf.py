@@ -98,6 +98,13 @@ def knights_tour(board):
         pq = []
         for neighbour in neighbours[last_move[0]][last_move[1]]:
             if board[neighbour[0]][neighbour[1]] is None:
+                # Forward checking
+                if last_move_idx < m*n - 2 and \
+                   vertex_degrees[neighbour[0]][neighbour[1]] == 0:
+                    # We need to make at least 2 more moves, but we
+                    # will not have any onward move after visiting this
+                    # neighbour
+                    return None
                 # We can make a valid move
                 heapq.heappush(pq, (vertex_degrees[neighbour[0]][neighbour[1]],
                                     neighbour))
