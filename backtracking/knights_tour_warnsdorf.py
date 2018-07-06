@@ -20,6 +20,12 @@ A: Can use backtracking, with a common simplification to improve efficiency.
       12 63 38 25 10  7 56 23
       37 26 11 62 55 24  9  6
 
+   NOTE: The runtime is roughly linear in the total size of the chess board,
+   however running on any chess board size with more than approximately
+   900 in squares is likely to result in stack overflow (this algorithm
+   is recursive, and python's default max recursion depth is 1000, so a
+   recursive call stack greater than this length will throw a RuntimeError.
+
 '''
 import heapq
 
