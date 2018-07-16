@@ -25,6 +25,10 @@ def vertex_coloring(graph, m):
         Check if there is a way to color the `graph` using vertices that have
         already been successfully colored in `color_dict`, considering the
         vertex at `vertices[idx]`
+
+        Coloring is done in the order of `vertices`, so we are done when `idx`
+        is equal to the length of `vertices`.
+
         '''
         if idx == len(vertices):
             # We have colored all vertices
