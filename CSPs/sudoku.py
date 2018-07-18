@@ -13,6 +13,31 @@ def select_free_square(board, domains):
     Select the next variable to assign to, using the Most Constrained Variable
     and Most Constraining Variable heuristics
     '''
+    # Upper bound on domain size
+    min_domain_size = 10
+    # The most constained square (possibly multiple)
+    mcvs = []
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == 0:
+                # This square is unassigned
+                if len(domains[i][j]) < min_domain_size:
+                    # This square is more constrained
+                    min_domain_size = len(domains[i][j])
+                    mcvs = [(i, j)]
+                elif len(domains[i][j]) == min_domain_size:
+                    mcvs.append((i, j))
+    # Return the most constraining square amongst the most contained
+    return most_constraining_variable(mcvs)
+
+
+def most_constraining_variable(squares):
+    '''
+    Return the most constraining square amongst squares, where the domain sizes
+    of the squares in `squares` are all equal and minimum amongst all squares
+    in `board`. To do this, we return the square which is involved in the most
+    constraints.
+    '''
     pass
 
 
@@ -32,7 +57,7 @@ def assign_value(board, square, value):
     pass
 
 
-def add_back_pruned(pruned):
+def add_back_pruned(board, pruned):
     '''
     Add back the values we pruned from the domains of squares as a result of
     applying AC3 and needing to backtrack.
@@ -60,8 +85,9 @@ def recursively_backtrack(board, domains, moves_remaining):
         if result is not None:
             return result
         # We have failed
-        add_back_pruned(pruned)
-    # No solution from this state of the board
+        add_back_pruned(board, pruned)
+    # Cannot assign any value to `square`, so there is no solution from this
+    # state
     return None
 
 
