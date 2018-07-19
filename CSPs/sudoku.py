@@ -243,3 +243,13 @@ def solve_sudoku(board):
     # Solve the board
     return recursively_backtrack(board, domains, moves_remaining)
 
+
+def main():
+   board = [[0, 2, 3, 4],
+            [4, 3, 0, 1],
+            [0, 1, 4, 2],
+            [2, 4, 1, 0]]
+   print solve_sudoku(board)
+
+if __name__ == '__main__':
+    main()
