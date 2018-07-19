@@ -111,7 +111,7 @@ With n variables, there are at most n choose 2 arcs, or O(n<sup>2</sup>). Checki
 def AC3(csp):
    # (Possibly) update variables in csp to have reduced domains
    arcs = queue(all valid arcs of csp)
-   while arcs is not empty:
+   while arcs not empty:
        (X_i, X_j) = arcs.pop()
        if remove_inconsistent_values(X_i, X_j):
            for X_k in neighbours[X_i]:
