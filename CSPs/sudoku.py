@@ -1,5 +1,5 @@
 import math
-import deque
+from collections import deque
 
 
 def constrained(square1, square2, board):
@@ -9,8 +9,8 @@ def constrained(square1, square2, board):
     '''
     if square1 == square2:
         return False
-    if not constrained.hasattr("subgridsize"):
-        constrained.subgridsize = math.sqrt(len(board))
+    if not hasattr(constrained, "subgridsize"):
+        constrained.subgridsize = int(math.sqrt(len(board)))
     if ((square1[0] == square2[0])    # same row
       or (square1[1] == square2[1])   # same column
       or ((square1[0]/constrained.subgridsize ==
@@ -31,7 +31,7 @@ def order_domain_values(board, domains, square):
     for i in range(len(board)):
         for j in range(len(board[0])):
             if not assigned((i, j), board) and\
-               constrained(square, (i, j)):
+               constrained(square, (i, j), board):
                 for value in n_constraints:
                     if value in domains[i][j]:
                         n_constraints[value] += 1
@@ -47,7 +47,7 @@ def select_free_square(board, domains):
     '''
     # Upper bound on domain size
     min_domain_size = 10
-    # The most constained square (possibly multiple)
+    # The most constrained square (possibly multiple)
     mcvs = []
     for i in range(len(board)):
         for j in range(len(board[0])):
@@ -65,7 +65,7 @@ def select_free_square(board, domains):
 
 def assigned(square, board):
     ''' Check if `square` is currently assigned a value in `board` '''
-    return board[square[0]][square[1]] == 0
+    return board[square[0]][square[1]] != 0
 
 
 def most_constraining_variable(board, squares):
@@ -85,7 +85,7 @@ def most_constraining_variable(board, squares):
         n_constraints = 0
         for i in range(len(board)):
             for j in range(len(board[0])):
-                if (board[i][j] == 0) and constrained(square, (i, j)):
+                if (board[i][j] == 0) and constrained(square, (i, j), board):
                     n_constraints += 1
         if n_constraints > max_num_constraints:
             max_num_constraints = n_constraints
@@ -129,7 +129,7 @@ def AC3(board, domains):
                 for j2 in range(j1+1, len(board)):
                     if not (assigned((i1, j1), board) and
                             assigned((i2, j2), board)):
-                        if constrained((i1, j1), (i2, j2)):
+                        if constrained((i1, j1), (i2, j2), board):
                             # Append arc for both directions
                             arcs.append(((i1, j1), (i2, j2)))
                             arcs.append(((i2, j2), (i1, j1)))
@@ -203,8 +203,11 @@ def solve_sudoku(board):
     # Board and subgrid sizes
     n = len(board)
     # Domain for each square initially contains everything
-    domains = [[set(range(1, 10)) for _ in range(n)]
+    domains = [[set(range(1, n+1)) for _ in range(n)]
                for _ in range(n)]
+    # How many moves left to make
+    moves_remaining = sum(sum(map(lambda s: s == 0, row))
+                          for row in board)
     # Solve the board
-    return recursively_backtrack(board, domains, n**2)
+    return recursively_backtrack(board, domains, moves_remaining)
 
