@@ -169,6 +169,34 @@ def add_back_pruned(domains, pruned):
         domains[square[0]][square[1]].union(removed)
 
 
+def consistent(value, square, domains, board):
+    '''
+    Check if assigning `value` to `square` does not break any constraints
+    '''
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if assigned((i, j), board) \
+               and constrained((i, j), square, board) \
+               and board[i][j] == value:
+                return False
+    return True
+
+
+def update_domains(board, square, value, domains):
+    '''
+    Update the domains of all constrained squares of `square` after assigning
+    `value` to `square`, and return what was removed.
+    '''
+    removed = {}
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if not assigned((i, j), board) \
+               and constrained((i, j), square, board) \
+               and value in domains[i][j]:
+                domains[i][j].remove(value)
+                removed[(i, j)] = removed.get((i, j), set()).add(value)
+    return removed
+
 def recursively_backtrack(board, domains, moves_remaining):
     '''
     Try to find a solution from the current state of the `board` and values
@@ -182,14 +210,18 @@ def recursively_backtrack(board, domains, moves_remaining):
     square = select_free_square(board, domains)
     # Select the next "best" value for this square
     for value in order_domain_values(board, domains, square):
-        assign_value(board, square, value)
-        # Reduce the domain of other squares if possible
-        pruned = AC3(board, domains)
-        result = recursively_backtrack(board, domains, moves_remaining-1)
-        if result is not None:
-            return result
-        # We have failed
-        add_back_pruned(domains, pruned)
+        if consistent(value, square, domains, board):
+            assign_value(board, square, value)
+            removed = update_domains(board, square, value, domains)
+            # Reduce the domain of other squares if possible
+            pruned = AC3(board, domains)
+            result = recursively_backtrack(board, domains, moves_remaining-1)
+            if result is not None:
+                return result
+            # We have failed
+            assign_value(board, square, 0)
+            add_back_pruned(domains, removed)
+            add_back_pruned(domains, pruned)
     # Cannot assign any value to `square`, so there is no solution from this
     # state
     return None
