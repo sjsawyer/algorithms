@@ -1,4 +1,5 @@
 import math
+import deque
 
 
 def constrained(square1, square2, board):
@@ -92,13 +93,64 @@ def most_constraining_variable(board, squares):
     return mcv
 
 
-def AC3(board):
+def _AC3_remove_inconsistent_values(arc, board, domains):
+    '''
+    Make this arc consistent by removing any values in the domain of the
+    tail of the arc that conflict with those in the head of the arc
+    '''
+    removed = set()
+    tail, head = arc
+    tail_domain = domains[tail[0]][tail[1]]
+    head_domain = domains[head[0]][head[1]]
+    for tail_value in tail_domain:
+        consistent = False
+        for head_value in head_domain:
+            if head_value != tail_value:
+                consistent = True
+                break
+        if not consistent:
+            # Remove this fail from tail's domain
+            tail_domain.remove(tail_value)
+            removed.add(tail_value)
+    return removed
+
+
+def AC3(board, domains):
     '''
     Update `board` to be arc consistent, and return anything that was pruned so
     that it can be added back in if we need to backtrack from this
     configuration.
     '''
-    pass
+    arcs = deque()
+    # Generate all constraint arcs for current state
+    for i1 in range(len(board)-1):
+        for j1 in range(len(board[0])-1):
+            for i2 in range(i1+1, len(board)):
+                for j2 in range(j1+1, len(board)):
+                    if not (assigned((i1, j1), board) and
+                            assigned((i2, j2), board)):
+                        if constrained((i1, j1), (i2, j2)):
+                            # Append arc for both directions
+                            arcs.append(((i1, j1), (i2, j2)))
+                            arcs.append(((i2, j2), (i1, j1)))
+    # Keep track of removed domain values so we can add them back in
+    # if backtracking is needed
+    pruned = {}
+    while arcs:
+        arc = arcs.popleft()
+        removed = _AC3_remove_inconsistent_values(arc, board, domains)
+        if removed:
+            # Update pruned
+            pruned[arc[0]] = pruned.get(arc[0], set()).union(removed)
+            # Add arcs back on that could now be inconsistent
+            # E.g. those pointing to the tail of the current arc
+            tail = arc[0]
+            for i in range(len(board)):
+                for j in range(len(board[0])):
+                    if not assigned((i, j), board) and \
+                       constrained((i, j), tail, board):
+                        arc.append(((i, j), tail))
+    return pruned
 
 
 def assign_value(board, square, value):
@@ -108,12 +160,13 @@ def assign_value(board, square, value):
     board[square[0]][square[1]] = value
 
 
-def add_back_pruned(board, pruned):
+def add_back_pruned(domains, pruned):
     '''
     Add back the values we pruned from the domains of squares as a result of
     applying AC3 and needing to backtrack.
     '''
-    pass
+    for square, removed in pruned.iteritems():
+        domains[square[0]][square[1]].union(removed)
 
 
 def recursively_backtrack(board, domains, moves_remaining):
@@ -131,12 +184,12 @@ def recursively_backtrack(board, domains, moves_remaining):
     for value in order_domain_values(board, domains, square):
         assign_value(board, square, value)
         # Reduce the domain of other squares if possible
-        pruned = AC3(board)
+        pruned = AC3(board, domains)
         result = recursively_backtrack(board, domains, moves_remaining-1)
         if result is not None:
             return result
         # We have failed
-        add_back_pruned(board, pruned)
+        add_back_pruned(domains, pruned)
     # Cannot assign any value to `square`, so there is no solution from this
     # state
     return None
@@ -149,7 +202,6 @@ def solve_sudoku(board):
     '''
     # Board and subgrid sizes
     n = len(board)
-    subgrid_length = math.sqrt(n)
     # Domain for each square initially contains everything
     domains = [[set(range(1, 10)) for _ in range(n)]
                for _ in range(n)]
