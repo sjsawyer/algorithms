@@ -109,9 +109,14 @@ def _AC3_remove_inconsistent_values(arc, board, domains):
                 consistent = True
                 break
         if not consistent:
-            # Remove this fail from tail's domain
-            tail_domain.remove(tail_value)
+            # This value is to be removed from tail's domain
+            # Cannot do it yet or else we will get the error
+            # RuntimeError: Set changed size during iteration
             removed.add(tail_value)
+    # Remove the inconsistent values from tail's domain
+    for tail_value in removed:
+        tail_domain.remove(tail_value)
+    # Return the values we removed
     return removed
 
 
