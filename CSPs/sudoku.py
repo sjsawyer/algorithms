@@ -247,6 +247,11 @@ def solve_sudoku(board):
     # Domain for each square initially contains everything
     domains = [[set(range(1, n+1)) for _ in range(n)]
                for _ in range(n)]
+    # Initial pruning of domains
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] != 0:
+                 _ = update_domains(board, (i, j), board[i][j], domains)
     # How many moves left to make
     moves_remaining = sum(sum(map(lambda s: s == 0, row))
                           for row in board)
