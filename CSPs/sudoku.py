@@ -251,7 +251,7 @@ def solve_sudoku(board):
     for i in range(len(board)):
         for j in range(len(board[0])):
             if board[i][j] != 0:
-                 _ = update_domains(board, (i, j), board[i][j], domains)
+                _ = update_domains(board, (i, j), board[i][j], domains)
     # How many moves left to make
     moves_remaining = sum(sum(map(lambda s: s == 0, row))
                           for row in board)
@@ -264,11 +264,34 @@ def print_board(board):
 
 
 def main():
-   board = [[0, 2, 3, 4],
-            [4, 3, 0, 1],
-            [0, 1, 4, 2],
-            [2, 4, 1, 0]]
-   solved_board = solve_sudoku(board)
+   board4 = [[0, 0, 0, 4],
+             [4, 3, 0, 1],
+             [0, 1, 4, 2],
+             [2, 4, 1, 0]]
+
+   board9 = [[0, 0, 0, 0, 0, 0, 0, 0, 1],
+             [0, 0, 6, 0, 7, 0, 0, 3, 0],
+             [0, 0, 0, 8, 3, 5, 0, 0, 0],
+             [0, 0, 3, 6, 0, 0, 0, 7, 0],
+             [0, 0, 0, 0, 1, 3, 0, 0, 0],
+             [5, 0, 0, 0, 4, 0, 8, 0, 0],
+             [1, 0, 5, 3, 0, 7, 0, 2, 6],
+             [0, 2, 0, 0, 0, 1, 7, 5, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 8]]
+
+
+   board92 = [[0, 6, 0, 8, 0, 0, 0, 1, 0],
+              [2, 0, 0, 0, 1, 0, 0, 0, 4],
+              [0, 0, 0, 9, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 5, 0, 6, 0, 8],
+              [0, 1, 0, 0, 0, 0, 0, 2, 0],
+              [9, 0, 5, 0, 4, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 1, 0, 0, 0],
+              [5, 0, 0, 0, 3, 0, 0, 0, 2],
+              [0, 8, 0, 0, 0, 6, 0, 7, 0]]
+
+
+   solved_board = solve_sudoku(board92)
    if solved_board:
        print_board(solved_board)
 
