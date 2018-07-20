@@ -166,7 +166,7 @@ def add_back_pruned(domains, pruned):
     applying AC3 and needing to backtrack.
     '''
     for square, removed in pruned.iteritems():
-        domains[square[0]][square[1]].union(removed)
+        domains[square[0]][square[1]].update(removed)
 
 
 def consistent(value, square, domains, board):
@@ -194,7 +194,10 @@ def update_domains(board, square, value, domains):
                and constrained((i, j), square, board) \
                and value in domains[i][j]:
                 domains[i][j].remove(value)
-                removed[(i, j)] = removed.get((i, j), set()).add(value)
+                if (i, j) in removed:
+                    removed[(i, j)].add(value)
+                else:
+                    removed[(i, j)] = set([value])
     return removed
 
 def recursively_backtrack(board, domains, moves_remaining):
