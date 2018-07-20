@@ -128,12 +128,14 @@ def AC3(board, domains):
     '''
     arcs = deque()
     # Generate all constraint arcs for current state
-    for i1 in range(len(board)-1):
-        for j1 in range(len(board[0])-1):
-            for i2 in range(i1+1, len(board)):
-                for j2 in range(j1+1, len(board)):
-                    if not (assigned((i1, j1), board) and
+    for i1 in range(len(board)):
+        for j1 in range(len(board[0])):
+            for i2 in range(len(board)):
+                for j2 in range(len(board)):
+                    if not (assigned((i1, j1), board) or
                             assigned((i2, j2), board)):
+                        # Note constrained returns False if arc points
+                        # to itself
                         if constrained((i1, j1), (i2, j2), board):
                             # Append arc for both directions
                             arcs.append(((i1, j1), (i2, j2)))
@@ -154,7 +156,7 @@ def AC3(board, domains):
                 for j in range(len(board[0])):
                     if not assigned((i, j), board) and \
                        constrained((i, j), tail, board):
-                        arc.append(((i, j), tail))
+                        arcs.append(((i, j), tail))
     return pruned
 
 
