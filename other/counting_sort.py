@@ -13,34 +13,51 @@ If there are n items in the array, the range of keys is k, then
 
 '''
 
-def counting_sort(a, min_element=m, max_element=n):
+def counting_sort(a, max_element, min_element=0):
     '''
     Sort the integers in the array `a` where the minimum element in the array
     is `min_element` and the maximum element is `max_element`
     '''
-    counts = [0 for _ in range(m, n+1)]
+    import pdb; pdb.set_trace()
+    counts = [0 for _ in range(max_element-min_element+1)]
     # count the number of occurences of each element
     for i in range(len(a)):
-        counts(a[i]-min_element) += 1
-    # calculate the starting index of each element in the sorted array
+        counts[a[i]-min_element] += 1
+    # calculate the starting index of each element in the sorted array by
+    # computing an accumulative sum of the `counts` array, and shifting
+    # all elements to the right by one, setting the first element to 0
     for i in range(1, len(counts)):
         counts[i] += counts[i-1]
+    for i in reversed(range(1, len(counts))):
+        counts[i] = counts[i-1]
+    counts[0] = 0
     # Create the sorted array
     s = [None for _ in range(len(a))]
     for i in range(len(a)):
-        counts[a[i]]
-
-a:     3, 2, 2, 4, 0, 2, 0
-
-k:     0 1 2 3 4
-count: 2 0 3 1 1
-
-count: 2 2 5 6 7
-       2 2 5 7 7
-
-[_ _ _ _ _ 3 _]
-
-0 0 2 2 2 3 4
+        current_element = a[i]
+        index = counts[current_element-min_element]
+        s[index] = current_element
+        # increase the starting index by 1
+        counts[current_element-min_element] += 1
+    # return the sorted array
+    return s
 
 
+def main():
+    import random
+    k_lower, k_upper = 0, 20
+    sample = range(k_lower, k_upper+1)
+    n = 100000
+    a = [random.choice(sample) for _ in range(n)]
+    #print a
+    import time
+    t = time.time()
+    counting_sort(a, k_upper, k_lower)
+    print "counting sort: {}".format(time.time() - t)
+    t2 = time.time()
+    sorted(a)
+    print "sorted: {}".format(time.time() - t2)
 
+
+if __name__ == '__main__':
+    main()
