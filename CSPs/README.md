@@ -137,3 +137,5 @@ def remove_inconsistent_values(X_i, X_j):
 https://www.cs.unc.edu/~lazebnik/fall10/lec07_csp.pdf
 
 https://www.cs.unc.edu/~lazebnik/fall10/lec08_csp2.pdf
+
+http://aima.cs.berkeley.edu/newchap05.pdf
