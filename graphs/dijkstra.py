@@ -16,8 +16,6 @@ def dijkstra(D, start, end):
     end: index of the target node
 
     '''
-    # priority queue prioritizing vertices with the lowest costs
-    pq = []
     # keep track of where we've come from
     previous = [None for _ in D]
     # create a list of cost, index pairs to serve as pointers to items in
@@ -26,8 +24,10 @@ def dijkstra(D, start, end):
     costs = [[sys.maxint, i] for i in xrange(len(D))]
     costs[start][0] = 0
     # initialize the priority queue
-    for i in xrange(len(D)):
-        heapq.heappush(pq, costs[i])
+    # each element in `pq` will be a reference to the corresponding element in
+    # `costs`
+    pq = costs[:]
+    heapq.heapify(pq)
     while pq:
         # get the next lowest cost node from the priority queue
         cost_to_i, i = heapq.heappop(pq)
@@ -38,6 +38,7 @@ def dijkstra(D, start, end):
             # `end` is not reachable from `start`
             raise RuntimeError("No path from {} to {} found".format(start, end))
         # explore the neighbors of this node
+        modified = False
         for j in xrange(len(D)):
             if D[i][j] != 0:
                 # i and j are adjacent
@@ -46,8 +47,11 @@ def dijkstra(D, start, end):
                     # update with the new cost
                     costs[j][0] = cost_with_i
                     previous[j] = i
-                    # maintain heap structure
-                    heapq.heapify(pq)
+                    modified = True
+        if modified:
+            # maintain heap structure. A descrease_key() operation in the above
+            # for-loop would be more efficient than heapify()
+            heapq.heapify(pq)
     # reconstruct the path in reversed order
     path = []
     prev = end
