@@ -59,7 +59,8 @@ def dijkstra(D, start, end):
 
 
 def main():
-    from sample_graphs import g2, g2_labels
+    from sample_graphs import g2_data
+    g2, g2_labels = g2_data
     start, end = 'a', 'c'
     startidx, endidx = g2_labels.index(start), g2_labels.index(end)
     path = dijkstra(g2, startidx, endidx)
