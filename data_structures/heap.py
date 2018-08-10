@@ -5,6 +5,27 @@ class Heap:
     and the element at position i will always be less than those at
     positions 2*i, 2*i + 1 (we start the heap at index 1, not 0)
 
+    TODO: No real need to start the index at 1, so start the index at 0.
+    Then the heap will satisfy the property:
+
+        if parent is i, then
+          lchild = 2*i + 1
+          rchild = 2*i + 2
+
+        if child is i, then
+          parent = (i-1)/2
+
+    TODO: Building a heap by naively repeated insertions is O(n*log(n)), and it
+    is possible to build a heap in O(n) time by repeatedly 'heapifying' every
+    subtree starting with the last node in the heap as the root of its own
+    subtree and working backwards to the beginning of the heap.
+
+    This looks like it will perform n heapify operations, but the first
+    n/2 nodes are leaves and require no modification, the next n/4 nodes
+    are trees of height 1 and require 1 operation, the next n/8 nodes are
+    trees of height 2 and require 2 operations, and this repeats until
+    the next 
+
     '''
     def __init__(self):
         self.heap = [None, ]
