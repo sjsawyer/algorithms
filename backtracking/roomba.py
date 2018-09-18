@@ -91,6 +91,23 @@ class Roomba:
         ''' Clean the current spot in the room '''
         self.room[self.current[0]][self.current[1]] = 'c'
 
+    @staticmethod
+    def _get_moves(src_tile, target_tile):
+        ''' Get the moves necessary to go from `src_tile` to `target_tile`
+
+        NOTE: Assumes `src_tile` and `target_tile` are adjacent
+        '''
+        pass
+
+    def _get_unvisited_neighbours(self, cleaned):
+        ''' Return the neighbours of the current state that we have not yet seen
+        '''
+        pass
+
+    def _undo_action(self, move_to_undo):
+        ''' Reverse the action taken in `move_to_undo` '''
+        pass
+
     def clean_room(self):
         ''' Clean the entire room
 
@@ -101,7 +118,41 @@ class Roomba:
         '''
         # Every time we go to a new tile, we will clean it and add it's valid
         # neighbours onto a stack to be visited.
-        cleaned, to_clean = [], []
+        cleaned, to_clean = {}, []
+        # Store the actions we have taken
+        actions = []
+        # Initialize `to_clean` with the current tile
+        to_clean.append(self.current)
+        # start cleaning
+        while to_clean:
+            dirty_tile = to_clean.pop()
+            # move to the tile
+            moves = self._get_moves(self.current, dirty_tile)
+            for move in moves:
+                move()
+            # Store these moves for future use
+            actions.append(moves)
+            # clean the tile
+            self.clean()
+            # add our neighbours to be cleaned
+            dirty_neighbours = self.get_unvisited_neighbours(cleaned)
+            if not dirty_neighbours:
+                # no where to go from here, undo the last move
+                move_to_undo = actions.pop()
+                self._undo_action(move_to_undo)
+            for adjacent_tile in self._get_unvisited_neighbours(cleaned):
+                to_clean.append(adjacent_tile)
+        # in case we have cleaned all tiles and are not at the starting point
+        for action in actions:
+            self._undo_action(action)
+
+
+
+
+
+
+
+
 
 
 
