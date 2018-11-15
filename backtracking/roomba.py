@@ -118,7 +118,7 @@ class Roomba:
         '''
         # Every time we go to a new tile, we will clean it and add it's valid
         # neighbours onto a stack to be visited.
-        cleaned, to_clean = {}, []
+        cleaned, to_clean = set(), []
         # Store the actions we have taken
         actions = []
         # Initialize `to_clean` with the current tile
@@ -135,11 +135,11 @@ class Roomba:
             # clean the tile
             self.clean()
             # add our neighbours to be cleaned
-            dirty_neighbours = self.get_unvisited_neighbours(cleaned)
+            dirty_neighbours = self._get_unvisited_neighbours(cleaned)
             if not dirty_neighbours:
                 # no where to go from here, undo the last move
-                move_to_undo = actions.pop()
-                self._undo_action(move_to_undo)
+                moves_to_undo = actions.pop()
+                self._undo_action(moves_to_undo)
             for adjacent_tile in self._get_unvisited_neighbours(cleaned):
                 to_clean.append(adjacent_tile)
         # in case we have cleaned all tiles and are not at the starting point
