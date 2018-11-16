@@ -39,6 +39,8 @@ class Roomba:
         self.room = room
         self.current = starting_coordinate
         self.heading = heading
+        self._parent_array = [[None for _ in self.room[0]]
+                              for _ in self.room]
 
     def _valid_tile(self, coord):
         ''' Check if we can move to the tile at `coord` '''
@@ -47,7 +49,7 @@ class Roomba:
         except IndexError:
             return False
 
-    def _move(self):
+    def _move_forward(self):
         ''' Move the roomba one square forward
 
         Returns:
@@ -60,15 +62,15 @@ class Roomba:
         '''
 
         dx, dy = 0, 0
-        if self.heading == Heading.NORTH or Heading.SOUTH:
+        if self.heading == self.Heading.NORTH or self.Heading.SOUTH:
             # We're moving vertically
-            if self.heading == Heading.NORTH:
+            if self.heading == self.Heading.NORTH:
                 dy += 1
             else:
                 dy -= 1
         else:
             # We're moving horizontally
-            if self.heading == Heading.EAST:
+            if self.heading == self.Heading.EAST:
                 dx += 1
             else:
                 dx -= 1
@@ -91,21 +93,42 @@ class Roomba:
         ''' Clean the current spot in the room '''
         self.room[self.current[0]][self.current[1]] = 'c'
 
-    @staticmethod
-    def _get_moves(src_tile, target_tile):
-        ''' Get the moves necessary to go from `src_tile` to `target_tile`
+    def _move(target_tile):
+        ''' Move from the current tile to `target_tile`
 
-        NOTE: Assumes `src_tile` and `target_tile` are adjacent
+        NOTE: Assumes `self.current` and `target_tile` are adjacent
         '''
-        pass
+        moves = []
+        # First adjust the heading
+        if self.current[0] == target_tile[0]:
+            # move vertically
+            if self.current[0] > target_tile[0]:
+                # move up
+
+
+
+        else:
+            # move_horizontally
+
+
+        # obtain moves (list of _move_forward, _rotate_ccw, _rotate_cw)
+        # ... <add that logic here> ...
+        for move in moves:
+            move()
+
+    def _set_parent(self, parent, child):
+        ''' Set the `parent` tile of `child` tile in self._parent_array
+        '''
+        self._parent_array[child[0]][child[1]] = parent
+
+    def _get_parent(self):
+        ''' Get parent of the current tile
+        '''
+        return self._parent_array[self.current[0]][self.current[1]]
 
     def _get_unvisited_neighbours(self, cleaned):
         ''' Return the neighbours of the current state that we have not yet seen
         '''
-        pass
-
-    def _undo_action(self, move_to_undo):
-        ''' Reverse the action taken in `move_to_undo` '''
         pass
 
     def clean_room(self):
@@ -119,44 +142,33 @@ class Roomba:
         # Every time we go to a new tile, we will clean it and add it's valid
         # neighbours onto a stack to be visited.
         cleaned, to_clean = set(), []
-        # Store the actions we have taken
-        actions = []
         # Initialize `to_clean` with the current tile
+        # (this tile has no parent, which we can use as a terminating condition)
         to_clean.append(self.current)
         # start cleaning
         while to_clean:
             dirty_tile = to_clean.pop()
             # move to the tile
-            moves = self._get_moves(self.current, dirty_tile)
-            for move in moves:
-                move()
-            # Store these moves for future use
-            actions.append(moves)
+            self._move(dirty_tile)
+            # keep track of where we've come from
+            self._set_parent(self.current, dirty_tile)
             # clean the tile
             self.clean()
             # add our neighbours to be cleaned
             dirty_neighbours = self._get_unvisited_neighbours(cleaned)
-            if not dirty_neighbours:
-                # no where to go from here, undo the last move
-                moves_to_undo = actions.pop()
-                self._undo_action(moves_to_undo)
-            for adjacent_tile in self._get_unvisited_neighbours(cleaned):
-                to_clean.append(adjacent_tile)
-        # in case we have cleaned all tiles and are not at the starting point
-        for action in actions:
-            self._undo_action(action)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            if dirty_neighbours:
+                # Add these onto the stack
+                for neighbour in dirty_neighbours:
+                    to_clean.append(neighbour)
+            else:
+                # Nothing to do from here, backtrack
+                # Put below logic in a function?
+                parent = self._get_parent()
+                while parent:
+                    self._move(parent)
+                    if self._get_unvisited_neighbours(cleaned):
+                        # We have backtracked far enough
+                        # This should always be true
+                        assert to_clean[-1] in self._get_unvisited_neighbours
+                        break
+                    parent = self._get_parent()
