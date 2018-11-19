@@ -61,7 +61,7 @@ class Roomba:
 
         '''
 
-        dx, dy = 0, 0
+        dy, dx = 0, 0
         if self.heading == self.Heading.NORTH or self.Heading.SOUTH:
             # We're moving vertically
             if self.heading == self.Heading.NORTH:
@@ -74,7 +74,7 @@ class Roomba:
                 dx += 1
             else:
                 dx -= 1
-        new_coordinate = (self.current[0] + dx, self.current[1] + dy)
+        new_coordinate = (self.current[1] + dy, self.current[0] + dx)
         if self.valid_tile(new_coordinate):
             self.current = new_coordinate
             return True
