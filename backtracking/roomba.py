@@ -81,6 +81,21 @@ class Roomba:
         else:
             return False
 
+    def _rotate(self, target_heading):
+        ''' Rotate the roomba to be facing `target_heading`
+        '''
+        difference = target_heading - self.heading
+        if abs(difference) == 3:
+            # simpler to reverse the direction of rotation
+            if difference == -3:
+                difference = 1
+            else:
+                difference = -1
+        if difference > 0:
+            self._rotate_ccw()
+        else:
+            self._rotate_cw()
+
     def _rotate_cw(self, n):
         ''' Perform `n` 90 degree rotations clockwise '''
         self.heading = (self.heading + n) % 4
@@ -93,28 +108,30 @@ class Roomba:
         ''' Clean the current spot in the room '''
         self.room[self.current[0]][self.current[1]] = 'c'
 
-    def _move(target_tile):
+    def _move(self, target_tile):
         ''' Move from the current tile to `target_tile`
 
         NOTE: Assumes `self.current` and `target_tile` are adjacent
         '''
-        moves = []
         # First adjust the heading
         if self.current[0] == target_tile[0]:
             # move vertically
             if self.current[0] > target_tile[0]:
                 # move up
-
-
-
+                self._rotate(self.Heading.NORTH)
+            else:
+                # move down
+                self._rotate(self.Heading.SOUTH)
         else:
-            # move_horizontally
-
-
-        # obtain moves (list of _move_forward, _rotate_ccw, _rotate_cw)
-        # ... <add that logic here> ...
-        for move in moves:
-            move()
+            # move horizontally
+            if self.current[1] > target_tile[1]:
+                # move left
+                self._rotate(self.Heading.WEST)
+            else:
+                # move right
+                self._rotate(self.Heading.EAST)
+        # move forward
+        self._move_forward()
 
     def _set_parent(self, parent, child):
         ''' Set the `parent` tile of `child` tile in self._parent_array
@@ -129,7 +146,17 @@ class Roomba:
     def _get_unvisited_neighbours(self, cleaned):
         ''' Return the neighbours of the current state that we have not yet seen
         '''
-        pass
+        current_y, current_x = self.current
+        # Get all possible neighbouring tiles (possibly invalid)
+        neighbours = ((current_y-1, current_x),
+                      (current_y+1, current_x),
+                      (current_y, current_x-1),
+                      (current_y, current_x+1))
+        # Filter for only the valid tiles we have not cleaned yet
+        unvisited_neighbours = set([
+            neighbour for neighbour in neighbours
+            if neighbour not in cleaned and self._valid_tile(neighbour)])
+        return unvisited_neighbours
 
     def clean_room(self):
         ''' Clean the entire room
