@@ -41,13 +41,15 @@ class Roomba:
         self.heading = heading
         self._parent_array = [[None for _ in self.room[0]]
                               for _ in self.room]
+        assert self._valid_tile(self.current), \
+            "Roomba placed on an invalid tile at {}".format(self.current)
 
     def _valid_tile(self, coord):
         ''' Check if we can move to the tile at `coord` '''
-        try:
-            return self.room[coord[0]][coord[1]] != '#'
-        except IndexError:
-            return False
+        y, x = coord
+        return ((0 <= x < len(self.room[0])) and
+                (0 <= y < len(self.room)) and
+                self.room[y][x] != '#')
 
     def _move_forward(self):
         ''' Move the roomba one square forward
@@ -62,20 +64,21 @@ class Roomba:
         '''
 
         dy, dx = 0, 0
-        if self.heading == self.Heading.NORTH or self.Heading.SOUTH:
+        if self.heading == self.Heading.NORTH or \
+           self.heading == self.Heading.SOUTH:
             # We're moving vertically
             if self.heading == self.Heading.NORTH:
-                dy += 1
-            else:
                 dy -= 1
+            else:
+                dy += 1
         else:
             # We're moving horizontally
             if self.heading == self.Heading.EAST:
                 dx += 1
             else:
                 dx -= 1
-        new_coordinate = (self.current[1] + dy, self.current[0] + dx)
-        if self.valid_tile(new_coordinate):
+        new_coordinate = (self.current[0] + dy, self.current[1] + dx)
+        if self._valid_tile(new_coordinate):
             self.current = new_coordinate
             return True
         else:
@@ -92,9 +95,9 @@ class Roomba:
             else:
                 difference = -1
         if difference > 0:
-            self._rotate_ccw()
+            self._rotate_cw(difference)
         else:
-            self._rotate_cw()
+            self._rotate_ccw(-1*difference)
 
     def _rotate_cw(self, n):
         ''' Perform `n` 90 degree rotations clockwise '''
@@ -113,8 +116,11 @@ class Roomba:
 
         NOTE: Assumes `self.current` and `target_tile` are adjacent
         '''
+        # Make sure we need to move
+        if target_tile == self.current:
+            return False
         # First adjust the heading
-        if self.current[0] == target_tile[0]:
+        if self.current[0] != target_tile[0]:
             # move vertically
             if self.current[0] > target_tile[0]:
                 # move up
@@ -131,7 +137,7 @@ class Roomba:
                 # move right
                 self._rotate(self.Heading.EAST)
         # move forward
-        self._move_forward()
+        return self._move_forward()
 
     def _set_parent(self, parent, child):
         ''' Set the `parent` tile of `child` tile in self._parent_array
@@ -175,12 +181,15 @@ class Roomba:
         # start cleaning
         while to_clean:
             dirty_tile = to_clean.pop()
-            # move to the tile
-            self._move(dirty_tile)
-            # keep track of where we've come from
-            self._set_parent(self.current, dirty_tile)
+            # move to the tile, if we can
+            old_current = self.current
+            if self._move(dirty_tile):
+                assert self.current == dirty_tile
+                # keep track of where we've come from
+                self._set_parent(old_current, self.current)
             # clean the tile
             self.clean()
+            cleaned.add(self.current)
             # add our neighbours to be cleaned
             dirty_neighbours = self._get_unvisited_neighbours(cleaned)
             if dirty_neighbours:
