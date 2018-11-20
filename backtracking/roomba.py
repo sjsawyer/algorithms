@@ -149,8 +149,8 @@ class Roomba:
         '''
         return self._parent_array[self.current[0]][self.current[1]]
 
-    def _get_unvisited_neighbours(self, cleaned):
-        ''' Return the neighbours of the current state that we have not yet seen
+    def _get_neighbours(self):
+        ''' Return the valid neighbours of the current state
         '''
         current_y, current_x = self.current
         # Get all possible neighbouring tiles (possibly invalid)
@@ -159,10 +159,9 @@ class Roomba:
                       (current_y, current_x-1),
                       (current_y, current_x+1))
         # Filter for only the valid tiles we have not cleaned yet
-        unvisited_neighbours = set([
-            neighbour for neighbour in neighbours
-            if neighbour not in cleaned and self._valid_tile(neighbour)])
-        return unvisited_neighbours
+        neighbours = set((neighbour for neighbour in neighbours
+                          if self._valid_tile(neighbour)))
+        return neighbours
 
     def clean_room(self):
         ''' Clean the entire room
@@ -174,10 +173,11 @@ class Roomba:
         '''
         # Every time we go to a new tile, we will clean it and add it's valid
         # neighbours onto a stack to be visited.
-        cleaned, to_clean = set(), []
+        seen, to_clean = set(), []
         # Initialize `to_clean` with the current tile
         # (this tile has no parent, which we can use as a terminating condition)
         to_clean.append(self.current)
+        seen.add(self.current)
         # start cleaning
         while to_clean:
             dirty_tile = to_clean.pop()
@@ -189,23 +189,22 @@ class Roomba:
                 self._set_parent(old_current, self.current)
             # clean the tile
             self.clean()
-            cleaned.add(self.current)
             # add our neighbours to be cleaned
-            dirty_neighbours = self._get_unvisited_neighbours(cleaned)
-            if dirty_neighbours:
-                # Add these onto the stack
-                for neighbour in dirty_neighbours:
+            neighbours_to_clean = \
+                filter(lambda neighbour: neighbour not in seen,
+                       self._get_neighbours())
+            if neighbours_to_clean:
+                for neighbour in neighbours_to_clean:
                     to_clean.append(neighbour)
+                    seen.add(neighbour)
             else:
                 # Nothing to do from here, backtrack
                 # Put below logic in a function?
                 parent = self._get_parent()
                 while parent:
                     self._move(parent)
-                    if self._get_unvisited_neighbours(cleaned):
+                    if to_clean and to_clean[-1] in self._get_neighbours():
                         # We have backtracked far enough
-                        # This should always be true
-                        assert to_clean[-1] in self._get_unvisited_neighbours
                         break
                     parent = self._get_parent()
 
