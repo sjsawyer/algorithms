@@ -199,3 +199,15 @@ class Roomba:
                         assert to_clean[-1] in self._get_unvisited_neighbours
                         break
                     parent = self._get_parent()
+
+def main():
+    room = [[' ', ' ', ' ', '#'],
+            [' ', '#', '#', ' '],
+            [' ', ' ', '#', ' '],
+            [' ', ' ', ' ', ' '], ]
+    roomba = Roomba(room, (0, 0))
+    roomba.clean_room()
+
+
+if __name__ == '__main__':
+    main()
