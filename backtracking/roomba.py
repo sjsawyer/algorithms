@@ -1,6 +1,12 @@
 """
+roomba.py
+
 This module provides a roomba class, which will enter into a room and clean it.
-An example is provided in the main function.
+The algorithm is simply DFS on a grid, however with the added restriction that
+we can only travel vertically and horizontally one square at any given time.
+That is, when a new cell on the grid is popped off the stack, we cannot simply
+jump to it, as we are a vacuum that cannot break the space-time continuum. We
+must travel one cell at a time on our grid to reach it.
 
 """
 
@@ -8,7 +14,7 @@ An example is provided in the main function.
 class Roomba:
     """A roomba vacuum to clean a room.
 
-    <more thorough decription of the class>
+    Given a room
 
     Attributes:
         room (list of list of characters): room to be cleaned
