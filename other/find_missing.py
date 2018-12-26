@@ -38,8 +38,9 @@ def find_missing(arr1, arr2):
     assert len(arr1) + 1 == len(arr2)
     # Running total of the sum/diffeence
     s = 0
-    # Keep track of the absolute value of the running total
-    max_sum = -sys.maxint
+    # Not part of the algorithm, but keep track of the absolute value of the
+    # running total
+    _max_sum = -sys.maxint
     # Pointers to indices of `arr1` and `arr2`
     i1, i2 = 0, 0
     # Sum all elements of `arr2` and subtract all elements of `arr1`
@@ -50,17 +51,20 @@ def find_missing(arr1, arr2):
         else:
             s += arr2[i2]
             i2 += 1
-        max_sum = max(max_sum, abs(s))
+        _max_sum = max(_max_sum, abs(s))
     # Ensure we've used all elements
     while i1 < len(arr1):
         s -= arr1[i1]
         i1 += 1
-        max_sum = max(max_sum, abs(s))
+        _max_sum = max(_max_sum, abs(s))
     while i2 < len(arr2):
         s += arr2[i2]
         i2 += 1
-        max_sum = max(max_sum, abs(s))
-    return s, max_sum
+        _max_sum = max(_max_sum, abs(s))
+    # Ensure the magnitude of our running total never exceeded the value of
+    # the greatest number in the arrays
+    assert abs(_max_sum) <= max(arr2)
+    return s
 
 
 def main():
