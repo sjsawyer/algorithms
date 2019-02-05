@@ -40,8 +40,6 @@ def contiguous_array_sum(a, s):
     # Store the total sums of elements up to each index
     # So a key of 10 that maps to 2 means we have seen the sum 10 twice so far
     sum_map = {}
-    # Add a sum of 0 to the map, indicating the beginning of the list
-    sum_map[0] = 1
     # variable to keep track of the sum
     sum_so_far = 0
     # what we will return
@@ -49,13 +47,16 @@ def contiguous_array_sum(a, s):
 
     for i in range(0, len(a)):
         sum_so_far += a[i]
-        # add/update the number of occurrences of this sum so far
-        sum_map[sum_so_far] = sum_map.get(sum_so_far, 0) + 1
+        # Check if the sum of all elements up to here sum to `s`
+        if sum_so_far == s:
+            n_contiguous_sum_arrays += 1
         # check if the difference of where we are now minus the desired sum is
         # in the map
         if (sum_so_far - s) in sum_map:
             # We have a subarray sum
             n_contiguous_sum_arrays += sum_map[sum_so_far - s]
+        # add/update the number of occurrences of this sum so far
+        sum_map[sum_so_far] = sum_map.get(sum_so_far, 0) + 1
 
     return n_contiguous_sum_arrays
 
