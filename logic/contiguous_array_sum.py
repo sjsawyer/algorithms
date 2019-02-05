@@ -12,15 +12,20 @@ Q: Given an array of integers (positive or negative) `a` and an integer `s`,
 A: Naive solution would be to generate all contiguous sub-arrays, and determine
    which ones sum to the desired sum. If `n` is the length of the array `a`,
    then we can generate all contiguous subsequences by looping through `i` from
-   1 to n, and `j` from `i` to `n`.  This creates n^2 sequences, and summing
-   each sequence takes `j-i` time, which (after some math) results in an O(n^3)
-   running time algorithm.
+   1 to `n`, and `j` from `i` to `n`.  This creates `n^2` sequences, and
+   summing each sequence takes `j-i` time, which (after some math) results in
+   an `O(n^3)` running time algorithm.
 
    A better solution is to iterate over the array, keeping track of the sum of
-   elements so far.  At each element `a[i]`, add the sum of elements
-   `s_current` from indices 0 to `i` into a hash map, and check to see if
-   `s_current` - `s` is already in the hash map. If it is, then we have another
-   contiguous sub array that sums to `s`.
+   elements so far.  At each element `a[i]`, check to see if `sum_so_far - s`
+   is already in the hash map. If it is, then we have another contiguous sub
+   array that sums to `s`. Note this will not catch the case when `sum_so_far`
+   is equal to `s`, so we must check for this also. Then add the sum of
+   elements `sum_so_far` from indices 0 to `i` into the hash map.
+
+   Extra: If we wanted to return the sum arrays, we could keep track of the
+   indices of `a` where each consecutive accumulative sum occurs alongside
+   the count, and slice the array to get the sublists as necessary.
 
 '''
 
@@ -63,9 +68,10 @@ def contiguous_array_sum(a, s):
 
 def main():
     assert contiguous_array_sum([4, 2, -5, 6, 3, -8, 1, 9], 1) == 4
-    assert contiguous_array_sum([4, 2, 7, 5, 6], 9) == 1
+    assert contiguous_array_sum([0, 1, 2, 3], 3) == 3
     assert contiguous_array_sum([5, 3, 1], 7) == 0
-    print contiguous_array_sum([4, 0, 2], 0)
+    assert contiguous_array_sum([4, 0, 2], 0) == 1
+    assert contiguous_array_sum([0, 0, 0], 0) == 6
 
 
 if __name__ == '__main__':
