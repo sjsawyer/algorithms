@@ -52,6 +52,8 @@ def dijkstra(D, start, end):
             # maintain heap structure. A descrease_key() operation in the above
             # for-loop would be more efficient than heapify()
             heapq.heapify(pq)
+    # Retrieve the cost from when we broke
+    cost = cost_to_i
     # reconstruct the path in reversed order
     path = []
     prev = end
@@ -59,7 +61,7 @@ def dijkstra(D, start, end):
         path.append(prev)
         prev = previous[prev]
     path.reverse()
-    return path
+    return cost, path
 
 
 def main():
@@ -67,9 +69,10 @@ def main():
     g2, g2_labels = g2_data
     start, end = 'a', 'c'
     startidx, endidx = g2_labels.index(start), g2_labels.index(end)
-    path = dijkstra(g2, startidx, endidx)
+    cost, path = dijkstra(g2, startidx, endidx)
     labeled_path = [g2_labels[i] for i in path]
     print " -> ".join(labeled_path)
+    print "cost: {}".format(cost)
 
 
 if __name__ == '__main__':
