@@ -13,10 +13,11 @@ def combinations_of_length(arr, k):
         # all combinations using the last letter of `remaining`
         sofar.append(remaining.pop())
         _combinations(sofar, remaining)
-        # remove the letter
-        remaining.append(sofar.pop())
         # all combinations without the last letter of `remaining`
-        _combinations(sofar, remaining[:-1])
+        last_element = sofar.pop()
+        _combinations(sofar, remaining)
+        # backtrack by putting back to initial state
+        remaining.append(last_element)
 
     _combinations([], arr)
     return all_combinations
